@@ -91,18 +91,37 @@ void introduction() {
   }
 }
 
-/* TODO Because each player runs the same code, 
- - explain random time to wait for others
- - explain same code (otherwise one would always transmit to rest)
- - explain that what's getting broadcast is the random value
+/* Both DIY Gamer Kits in play need to agree on what random wait time
+ to use. One way to solve this is for one of the DIY Gamer Kits to take
+ charge always and broadcast the wait time to use.
+
+ But that would mean having two different programs: the "master" program
+ and the "slave" program.
+
+ The alternative used in this program is for each kit to attempt to take
+ charge randomly.
+
+ So in "broadcastReceived()" both kits listen for the other. But because
+ that function runs for a random amount of time, the first kit to finish
+ will take charge and broadcast the value to the other kit (it's very
+ unlikely that they both finish listening at the same time).
+
+ Described in a different way:
+
+     1. Kits "A" and "B" join the game
+     2. Both kits begin listening for a broadcast from the other
+     3. Randomly, one of the kits stops listening (e.g., "A") and it
+        broadcasts the wait time to the other kit ("B")
+     4. Now that both "A" and "B" have the same wait time, the countdown
+        can begin
+
+ Can this algorithm accommodate more than two DIY Gamer Kits joining the
+ game at the same time?
  */
 void synchronizeGamers() {
   waitForOtherPlayersToJoin();
 
   if (!broadcastReceived()) {
-    /* We've waited a while and no other Gamer has decided to transmit
-     a random value, so it's up to us.
-     */
     broadcastMessage();
   }
   
@@ -115,12 +134,10 @@ void waitForOtherPlayersToJoin() {
 
 boolean broadcastReceived() {
   /* We would like to wait for a while in case other DIY Gamer Kits
-   decide to broadcast before us.
+   decide to broadcast before us. But using "delay()" will not do because
+   we need to actively listen whilst letting the time pass.
 
-   But using "delay()" will not do because we need to listen whilst letting
-   the time pass.
-
-   The solution is to loop over and over untile "timeToListen" is greater
+   The solution is to loop over and over until "timeToListen" is greater
    than the time now ("millis()"), and the time when the loop first started
    running ("timeWhenListenBegan").
    */
@@ -171,11 +188,19 @@ void countdown() {
   mode++;
 }
 
+/* This function runs over and over (it's called by "loop()"). So in
+ each instant it first checks to see if the other player has pressed
+ the "fire" button or whether this player has pressed the button.
+
+ There is a chance that bother players will press the "fire" button at
+ the same time. In that case, they're both given the win and can call it
+ a draw.
+ */
 void detectShot() {
   String data = infrared.receive();
   if (data.length() > 0 && data.equals("B")) {
     gamer.printString("You lose");
-    mode = 0;
+    restart();
 
     return;
   }
@@ -184,7 +209,7 @@ void detectShot() {
     transmit("B"); //B for "Bang!"
     
     gamer.printString("You win");  
-    mode = 0;
+    restart();
   }
   
   checkForRestart();
@@ -192,6 +217,10 @@ void detectShot() {
 
 void checkForRestart() {
   if (gamer.isPressed(START)) {
-    mode = 0;
+    restart();
   }
+}
+
+void restart() {
+  mode = 0;
 }
