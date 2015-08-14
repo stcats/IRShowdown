@@ -191,8 +191,8 @@ void countdown() {
   gamer.printString("Set");
   delay(delayBeforeShooting * 500);
   infrared.receive(); //clear any buffered values before detecting shot
+  gamer.isPressed(UP); //clear any buffered keypresses
   gamer.printImage(go);
-
   mode++;
 }
 
@@ -207,6 +207,8 @@ void countdown() {
 void detectShot() {
   String data = infrared.receive();
   if (data.length() > 0 && data.equals("B")) {
+    gamer.clear();
+    delay(2000);
     playDefeat();
     restart();
 
