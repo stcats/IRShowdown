@@ -206,7 +206,6 @@ void detectShot() {
   char data = infrared.receive();
   if (data == 'B') {
     gamer.clear();
-    delay(2000);
     playDefeat();
     restart();
 
@@ -234,71 +233,6 @@ void playMorricone() {
   delay(100);
   gamer.playTone(Ab);
   delay(400);
-  gamer.stopTone();
-}
-
-void playMario() {
-  gamer.playTone(Bb);
-  delay(100);
-  gamer.playTone(Db);
-  delay(400);
-  gamer.stopTone();
-}
-
-void playChopin() {
-  gamer.playTone(G);
-  delay(400);
-  gamer.stopTone();
-  delay(100);
-  
-  gamer.playTone(G);
-  delay(300);
-  gamer.stopTone();
-  delay(100);
-  
-  gamer.playTone(G);
-  delay(50);
-  gamer.stopTone();
-  delay(50);
-  
-  gamer.playTone(G);
-  delay(400);
-  gamer.stopTone();
-  delay(100);
-  
-  gamer.playTone(Bb);
-  delay(400);
-  gamer.stopTone();
-  delay(100);
-
-  gamer.playTone(A);
-  delay(50);
-  gamer.stopTone();
-  delay(50);
-
-  gamer.playTone(A);
-  delay(300);
-  gamer.stopTone();
-  delay(100);
-
-  gamer.playTone(G);
-  delay(50);
-  gamer.stopTone();
-  delay(50);
-
-  gamer.playTone(G);
-  delay(300);
-  gamer.stopTone();
-  delay(100);
-
-  gamer.playTone(G);
-  delay(50);
-  gamer.stopTone();
-  delay(50);
-
-  gamer.playTone(G);
-  delay(400);
-  
   gamer.stopTone();
 }
 
