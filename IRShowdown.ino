@@ -28,10 +28,11 @@ int delayBeforeShooting;
  
      0 = in this state the game displays an image (the "splash screen")
          and waits for the player to press START
-     1 = the game tries to connect to other players (others that have
+     1 = the game tries to connect with other players (others that have
          also pressed START)
-     2 = the countdown begins and, as soon as a shot is fired the result
-         is displayed
+     2 = the countdown runs and after a random wait, displays "GO!"
+     3 = the game waits for the player to fire or receive enemy fire,
+         and then displays the result
 
  This instruction adds one to the "mode" variable, and therefore advances
  the game to the next stage:
@@ -120,11 +121,11 @@ void introduction() {
      2. Both kits begin listening for a broadcast from the other
      3. Randomly, one of the kits stops listening (e.g., "A") and it
         broadcasts the wait time to the other kit ("B")
-     4. Now that both "A" and "B" have the same wait time, the countdown
-        can begin
+     4. Because "B" is still listening, it registers the broadcast from
+        "A". Now that they're both "in synch" the countdown can begin
 
- Can this algorithm accommodate more than two DIY Gamer Kits joining the
- game at the same time?
+ Do you think this algorithm would allow more than two DIY Gamer Kits to
+ play at the same time?
  */
 void synchronizeGamers() {
   waitForOtherPlayersToJoin();
@@ -145,22 +146,19 @@ boolean broadcastReceived() {
    decide to broadcast before us. But using "delay()" will not do because
    we need to actively listen whilst letting the time pass.
 
-   The solution is to loop over and over until "timeToListen" is greater
-   than the time now ("millis()"), and the time when the loop first started
-   running ("timeWhenListenBegan").
+   The solution is to loop over and over until the time now ("millis()")
+   is greater than (or past) "listenUntil".
    */
   int timeToListen = random(100, 1000);
-  unsigned long timeWhenListenBegan = millis();
+  unsigned long listenUntil = millis() + timeToListen;
 
-  while (millis() < (timeWhenListenBegan + timeToListen)) {
-    String data = infrared.receive();
+  while (millis() < listenUntil) {
+    char data = infrared.receive();
 
-    if (data.length() > 0) {
-      delayBeforeShooting = data.toInt();
+    if (data > 0) {
+      delayBeforeShooting = (int) data;
 
-      if (delayBeforeShooting > 0) { //have we received a valid number?
-        return true;
-      }
+      return true;
     }
   }
 
@@ -177,10 +175,10 @@ void broadcastMessage() {
 }
 
 void transmit(int number) {
-  transmit((String) number);
+  transmit(number);
 }
 
-void transmit(String string) {
+void transmit(char string) {
   gamer.setLED(1);
   infrared.send(string);
   gamer.setLED(0);
@@ -190,7 +188,7 @@ void countdown() {
   gamer.printString("Ready");
   gamer.printString("Set");
   delay(delayBeforeShooting * 500);
-  infrared.receive(); //clear any buffered values before detecting shot
+  infrared.receive();  //clear any buffered values before detecting shot
   gamer.isPressed(UP); //clear any buffered keypresses
   gamer.printImage(go);
   mode++;
@@ -200,13 +198,13 @@ void countdown() {
  each instant it first checks to see if the other player has pressed
  the "fire" button or whether this player has pressed the button.
 
- There is a chance that bother players will press the "fire" button at
+ There is a chance that other players will press the "fire" button at
  the same time. In that case, they're both given the win and can call it
  a draw.
  */
 void detectShot() {
-  String data = infrared.receive();
-  if (data.length() > 0 && data.equals("B")) {
+  char data = infrared.receive();
+  if (data == 'B') {
     gamer.clear();
     delay(2000);
     playDefeat();
@@ -216,7 +214,7 @@ void detectShot() {
   }
 
   if (gamer.isPressed(UP)) {
-    transmit("B"); //B for "Bang!"
+    transmit('B'); //B for "Bang!"
     
     playWin();
     restart();
