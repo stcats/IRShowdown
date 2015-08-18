@@ -2,20 +2,16 @@
 
 This is a multiplayer game for the [DIY Gamer Kit](http://www.techwillsaveus.com/shop/diy-kits/diy-gamer-kit-arduino/).
 
-Both players press start. A countdown starts taking place, saying **ready**, **set**, **go**! Once go is written to the screen, users can press start to fire. Last person who fires loses. A message is displayed to both the winner and loser's screen. 
+## How to play
+
+1. Both players must press the START button at the same time
+2. A countdown will begin saying **Ready**, **Set**, **GO**!
+3. When **GO** appears, the first player to press the UP button will win
 
 ## Installation
 
-Add the cloned folder inside your Arduino sketchbook. The location of this folder will depend on your operating system:
+If you haven't already, install the [DIY Gamer Kit](https://github.com/techwillsaveus/Gamer) and [IR](https://github.com/techwillsaveus/GamerIR) libraries.
 
-	Operating System|Folder
-	----------------|----------------------------------
-	Windows         |`My Documents\Arduino\libraries`
-	Mac OS X        |`Documents/Arduino/libraries`
-	Linux           |`~/Documents/Arduino/libraries`
+Then download this repository (or the `IRShowdown.ino` sketch) and upload it to your DIY Gamer Kit.
 
-The exact folder on your computer may be a little different. That's OK.
-
-## To-do
-
-We are still pretty early on in its development, but the skeleton is there. Add to-do items here.
+Enjoy!
