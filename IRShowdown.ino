@@ -166,9 +166,6 @@ boolean broadcastReceived() {
 }
 
 void broadcastMessage() {
-  /* A larger range will reduce the reliability because the transmission will
-   require two characters.
-   */
   delayBeforeShooting = random(1, 9);
 
   transmit(delayBeforeShooting);
